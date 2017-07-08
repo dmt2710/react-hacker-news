@@ -1,10 +1,18 @@
 import * as React from 'react';
-import Story from '../types/story';
 import StoryListItem from '../components/StoryListItem';
+import Loader from '../components/Loader';
+import { PER_PAGE, API_BASE_URL } from '../constants';
+import Story from '../types/story';
+import ButtonEvent from '../types/event';
 
 interface HomeState {
   newStoryIds: Array<number>;
   stories: Array<Story>;
+  currentPage: number;
+  currentStartIndex: number;
+  currentEndIndex: number;
+  isLastPage: boolean;
+  isLoading: boolean;
 }
 
 export default class Home extends React.Component<any, HomeState> {
@@ -14,18 +22,23 @@ export default class Home extends React.Component<any, HomeState> {
     this.state = {
       newStoryIds: [],
       stories: [],
+      currentPage: 1,
+      currentStartIndex: 0,
+      currentEndIndex: PER_PAGE,
+      isLastPage: false,
+      isLoading: true,
     };
   }
 
   async fetchNewStoryIds() {
-    const request = new Request('https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty');
+    const request = new Request(`${API_BASE_URL}/newstories.json?print=pretty`);
     const newStoryIds = await fetch(request).then(response => response.json()).then(json => json);
 
     return newStoryIds;
   }
 
   async fetchStory(storyId: number) {
-    const request = new Request(` https://hacker-news.firebaseio.com/v0/item/${storyId}.json?print=pretty`);
+    const request = new Request(`${API_BASE_URL}/item/${storyId}.json?print=pretty`);
     const story = await fetch(request).then(response => response.json());
     return story;
   }
@@ -35,17 +48,65 @@ export default class Home extends React.Component<any, HomeState> {
   }
 
   async componentDidMount() {
+    const { currentStartIndex, currentEndIndex } = this.state;
     const newStoryIds = await this.fetchNewStoryIds();
-    const first10StoryIds = newStoryIds.slice(0, 25);
+    const firstStoryIds = newStoryIds.slice(currentStartIndex, currentEndIndex);
     let stories: Array<Story> = [];
 
-    await this.fetchStories(first10StoryIds).then((rawStories: Array<Story>) => stories = rawStories);
+    await this.fetchStories(firstStoryIds).then((rawStories: Array<Story>) => stories = rawStories);
 
-    this.setState({ newStoryIds, stories });
+    this.setState({ newStoryIds, stories, isLoading: false });
+  }
+
+  handlePaginate = (event: ButtonEvent) => {
+    const direction = event.target.dataset.direction;
+
+    this.setState({ isLoading: true });
+
+    if (direction === 'next') {
+      this.setState((prevState: HomeState) => {
+        return { currentPage: prevState.currentPage + 1,
+                 currentStartIndex: prevState.currentStartIndex + PER_PAGE,
+                 currentEndIndex: prevState.currentEndIndex + PER_PAGE,
+        };
+      }, this.refreshNewStories);
+    }
+
+    if (direction === 'previous') {
+      this.setState((prevState: HomeState) => {
+        return { currentPage: prevState.currentPage - 1,
+                 currentStartIndex: prevState.currentStartIndex - (PER_PAGE),
+                 currentEndIndex: prevState.currentStartIndex,
+        };
+      }, this.refreshNewStories);
+    }
+  }
+
+  refreshNewStories = async () => {
+    let stories: Array<Story> = [];
+    const { currentStartIndex, currentEndIndex, newStoryIds } = this.state;
+    const storyIds = newStoryIds.slice(currentStartIndex, currentEndIndex);
+
+    await this.fetchStories(storyIds).then((rawStories: Array<Story>) => stories = rawStories);
+
+    this.setState({ stories, isLoading: false });
+  }
+
+  renderResultPage() {
+    const { stories } = this.state;
+
+    return (
+      <ul className="list-group">
+        {stories.map((story: Story) => {
+          return (<li key={story.id} className="list-group-item"><StoryListItem story={story} /></li>);
+        })}
+      </ul>
+    );
   }
 
   render() {
-    const { stories } = this.state;
+    const { currentPage, isLastPage, isLoading } = this.state;
+
     return (
       <div className="container-fluid">
         <div className="panel panel-default">
@@ -53,14 +114,28 @@ export default class Home extends React.Component<any, HomeState> {
             Stories
           </div>
           <div className="panel-body">
-            <ul className="list-group">
-              {stories.map((story: Story) => {
-                return (<li key={story.id} className="list-group-item"><StoryListItem story={story} /></li>);
-              })}
-            </ul>
+            {isLoading ? <Loader /> : this.renderResultPage()}
           </div>
           <div className="panel-footer">
-            Pagination goes here
+            <button
+              data-direction="previous"
+              className="btn btn-primary"
+              disabled={currentPage === 1}
+              onClick={this.handlePaginate}
+            >
+              Previous
+            </button>
+            &nbsp;
+            <a
+              data-direction="next"
+              className="btn btn-primary"
+              disabled={isLastPage}
+              onClick={this.handlePaginate}
+            >
+              Next
+            </a>
+            <br />
+            Current Page: {currentPage}
           </div>
         </div>
       </div>
