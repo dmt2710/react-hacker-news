@@ -120,7 +120,7 @@ export default class Home extends React.Component<any, HomeState> {
             <button
               data-direction="previous"
               className="btn btn-primary"
-              disabled={currentPage === 1}
+              disabled={currentPage === 1 || isLoading}
               onClick={this.handlePaginate}
             >
               Previous
@@ -129,7 +129,7 @@ export default class Home extends React.Component<any, HomeState> {
             <a
               data-direction="next"
               className="btn btn-primary"
-              disabled={isLastPage}
+              disabled={isLastPage || isLoading}
               onClick={this.handlePaginate}
             >
               Next
