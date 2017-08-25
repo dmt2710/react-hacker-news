@@ -19,7 +19,9 @@
     "react-router-dom": "next",
     "react-scripts-ts": "2.3.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "prettier": "^1.5.3"
+  },
   "scripts": {
     "start": "react-scripts-ts start",
     "build": "react-scripts-ts build",

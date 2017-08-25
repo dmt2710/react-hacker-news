@@ -1,17 +1,37 @@
+import Story from '../types/story';
+import Comment from '../types/comment';
 import * as React from 'react';
 import * as moment from 'moment';
-import { extractHostName } from '../utilities/helpers';
-import Story from '../types/story';
-import { STORY } from '../constants';
 import './StoryListItem.css';
+import ParentComments from './ParentComments';
+import { extractHostName } from '../utilities/helpers';
+import { STORY } from '../constants';
 
 interface StoryListItemProps {
   story: Story;
 }
 
+interface StoryListState {
+  comments: Array<Comment>;
+}
+
 const pluralize = require('pluralize');
 
-export default class StoryListItem extends React.Component<StoryListItemProps, {}> {
+export default class StoryListItem extends React.Component<StoryListItemProps, StoryListState> {
+  constructor(props: any) {
+    super(props);
+
+    this.state = {
+      comments: [],
+    };
+  }
+
+  handleViewComments = (event: any) => {
+    return (
+      <ParentComments comments={this.state.comments} />
+    );
+  }
+
   renderUrlSource(): any {
     const { story } = this.props;
 
@@ -32,7 +52,9 @@ export default class StoryListItem extends React.Component<StoryListItemProps, {
     }
 
     return (
-      <a className="item-inline text-muted">{pluralize('comments', story.kids.length, true)}</a>
+      <a onClick={this.handleViewComments}>
+        {pluralize('comments', story.kids.length, true)}
+      </a>
     );
   }
 
@@ -61,6 +83,10 @@ export default class StoryListItem extends React.Component<StoryListItemProps, {
         </div>
         <div>
           {this.renderInfos()}
+        </div>
+        <div className="collapse" id={`comments-${story.id}`}>
+          <div className="well">
+          </div>
         </div>
         <div className="clearfix"/>
       </div>
