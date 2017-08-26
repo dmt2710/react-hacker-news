@@ -1,35 +1,36 @@
 import Story from '../types/story';
-import Comment from '../types/comment';
 import * as React from 'react';
 import * as moment from 'moment';
 import './StoryListItem.css';
-import ParentComments from './ParentComments';
+import Comments from './Comments';
 import { extractHostName } from '../utilities/helpers';
 import { STORY } from '../constants';
+import { CommonEvent } from '../types/event';
 
 interface StoryListItemProps {
   story: Story;
 }
 
 interface StoryListState {
-  comments: Array<Comment>;
+  isCommentOpened: boolean;
 }
 
 const pluralize = require('pluralize');
+const Collapse = require('react-collapse');
 
 export default class StoryListItem extends React.Component<StoryListItemProps, StoryListState> {
   constructor(props: any) {
     super(props);
 
     this.state = {
-      comments: [],
+      isCommentOpened: false,
     };
   }
 
-  handleViewComments = (event: any) => {
-    return (
-      <ParentComments comments={this.state.comments} />
-    );
+  handleOpenComments = (event: CommonEvent) => {
+    this.setState({
+      isCommentOpened: !this.state.isCommentOpened,
+    });
   }
 
   renderUrlSource(): any {
@@ -52,7 +53,7 @@ export default class StoryListItem extends React.Component<StoryListItemProps, S
     }
 
     return (
-      <a onClick={this.handleViewComments}>
+      <a onClick={this.handleOpenComments}>
         {pluralize('comments', story.kids.length, true)}
       </a>
     );
@@ -74,6 +75,7 @@ export default class StoryListItem extends React.Component<StoryListItemProps, S
 
   render() {
     const { story } = this.props;
+    const { isCommentOpened } = this.state;
 
     return (
       <div>
@@ -84,10 +86,14 @@ export default class StoryListItem extends React.Component<StoryListItemProps, S
         <div>
           {this.renderInfos()}
         </div>
-        <div className="collapse" id={`comments-${story.id}`}>
-          <div className="well">
+        <Collapse isOpened={isCommentOpened} hasNestedCollapse={true}>
+          <div className="panel panel-default">
+            <div className="panel-heading" onClick={this.handleOpenComments}>Comments</div>
+            <div className="panel-body">
+              <Comments commentIDs={story.kids} />
+            </div>
           </div>
-        </div>
+        </Collapse>
         <div className="clearfix"/>
       </div>
     );

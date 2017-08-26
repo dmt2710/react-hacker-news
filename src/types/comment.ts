@@ -1,4 +1,4 @@
-type CommentType = 'comment';
+export type CommentType = 'comment';
 
 export interface Comment {
   by: string;

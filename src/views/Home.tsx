@@ -31,14 +31,15 @@ export default class Home extends React.Component<any, HomeState> {
   }
 
   async fetchNewStoryIds() {
-    const request = new Request(`${API_BASE_URL}/newstories.json?print=pretty`);
+    // const request = new Request(`${API_BASE_URL}/newstories.json?print=pretty`);
+    const request = new Request(`${API_BASE_URL}/topstories.json`);
     const newStoryIds = await fetch(request).then(response => response.json()).then(json => json);
 
     return newStoryIds;
   }
 
   async fetchStory(storyId: number) {
-    const request = new Request(`${API_BASE_URL}/item/${storyId}.json?print=pretty`);
+    const request = new Request(`${API_BASE_URL}/item/${storyId}.json`);
     const story = await fetch(request).then(response => response.json());
     return story;
   }
@@ -65,18 +66,20 @@ export default class Home extends React.Component<any, HomeState> {
 
     if (direction === 'next') {
       this.setState((prevState: HomeState) => {
-        return { currentPage: prevState.currentPage + 1,
-                 currentStartIndex: prevState.currentStartIndex + PER_PAGE,
-                 currentEndIndex: prevState.currentEndIndex + PER_PAGE,
+        return {
+          currentPage: prevState.currentPage + 1,
+          currentStartIndex: prevState.currentStartIndex + PER_PAGE,
+          currentEndIndex: prevState.currentEndIndex + PER_PAGE,
         };
       }, this.refreshNewStories);
     }
 
     if (direction === 'previous') {
       this.setState((prevState: HomeState) => {
-        return { currentPage: prevState.currentPage - 1,
-                 currentStartIndex: prevState.currentStartIndex - (PER_PAGE),
-                 currentEndIndex: prevState.currentStartIndex,
+        return {
+          currentPage: prevState.currentPage - 1,
+          currentStartIndex: prevState.currentStartIndex - (PER_PAGE),
+          currentEndIndex: prevState.currentStartIndex,
         };
       }, this.refreshNewStories);
     }

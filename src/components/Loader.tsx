@@ -8,4 +8,3 @@ export default class Loader extends React.Component<any, any> {
     );
   }
 }
-
