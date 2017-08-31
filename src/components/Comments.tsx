@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Comment from '../types/comment';
-import * as moment from 'moment';
 import './Comments.css';
+import CommentItem from './CommentItem';
 import { API_BASE_URL } from '../constants';
 
 interface CommentsProps {
@@ -12,8 +12,10 @@ interface CommentsState {
   comments: Array<Comment>;
 }
 
+const randomColor = require('randomcolor');
+
 export default class Comments extends React.Component<CommentsProps, CommentsState> {
-  constructor(props: any) {
+  constructor(props: CommentsProps) {
     super(props);
 
     this.state = {
@@ -41,28 +43,17 @@ export default class Comments extends React.Component<CommentsProps, CommentsSta
     return Promise.all(commentIDs.map((commentID: number) => this.fetchComment(commentID)));
   }
 
-  createMarkup(content: string) {
-    return { __html: content };
-  }
-
   renderCommentItems(): any {
     const { comments } = this.state;
+    const color = randomColor();
 
     return (
       <ul className="list-group">
         {comments.map((comment: Comment) => {
           if (comment.type === 'comment') {
             return (
-              <li key={comment.id} className="list-group-item">
-                <p className="text-left" dangerouslySetInnerHTML={this.createMarkup(comment.text)} />
-                <span className="text-left text-muted comment-position">
-                  by <b>{comment.by}</b>&nbsp;
-                {moment(parseInt(`${comment.time}000`, 10)).fromNow()}&nbsp;
-              </span>
-                <div className="clearfix" />
-                <div>
-                  {comment.kids ? <Comments commentIDs={comment.kids} /> : null}
-                </div>
+              <li key={comment.id} className="list-group-item" style={{ borderLeftColor: color, borderLeftWidth: 'medium' }}>
+                <CommentItem comment={comment} />
               </li>
             );
           } else {

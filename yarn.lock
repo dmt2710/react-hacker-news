@@ -25,6 +25,10 @@
   version "8.0.8"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.8.tgz#0dc4ca2c6f6fc69baee16c5e928c4a627f517ada"
 
+"@types/randomcolor@^0.4.3":
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/@types/randomcolor/-/randomcolor-0.4.3.tgz#66bf69fdf43ea7b73ae4c378f660442c8e236e93"
+
 "@types/react-dom@^15.5.1":
   version "15.5.1"
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-15.5.1.tgz#f3c3e14c682785923c7d64583537df319442dec1"
@@ -3969,6 +3973,10 @@ randombytes@^2.0.0, randombytes@^2.0.1:
   resolved "https://registry.yarnpkg.com/randombytes/-/randombytes-2.0.5.tgz#dc009a246b8d09a177b4b7a0ae77bc570f4b1b79"
   dependencies:
     safe-buffer "^5.1.0"
+
+randomcolor@^0.5.3:
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/randomcolor/-/randomcolor-0.5.3.tgz#7f90f2f2a7f6d5a52232161eeaeeaea9ac3b5815"
 
 range-parser@^1.0.3, range-parser@~1.2.0:
   version "1.2.0"

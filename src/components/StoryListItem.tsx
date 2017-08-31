@@ -13,6 +13,7 @@ interface StoryListItemProps {
 
 interface StoryListState {
   isCommentOpened: boolean;
+  toggledComments: boolean;
 }
 
 const pluralize = require('pluralize');
@@ -24,13 +25,31 @@ export default class StoryListItem extends React.Component<StoryListItemProps, S
 
     this.state = {
       isCommentOpened: false,
+      toggledComments: false,
     };
   }
 
   handleOpenComments = (event: CommonEvent) => {
     this.setState({
       isCommentOpened: !this.state.isCommentOpened,
+      toggledComments: !this.state.toggledComments,
     });
+  }
+
+  renderToggleCommentsIcon() {
+    const { story } = this.props;
+      if (!story.kids) {
+        return (
+          null
+        );
+      }
+  
+    return (
+      <a onClick={this.handleOpenComments}>
+        {this.state.toggledComments ? <span className="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span> :
+                                      <span className="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>}
+      </a>
+    );
   }
 
   renderUrlSource(): any {
@@ -69,6 +88,7 @@ export default class StoryListItem extends React.Component<StoryListItemProps, S
         <p className="item-inline text-muted">{moment(parseInt(`${story.time}000`, 10)).fromNow()}&nbsp;</p>
         <p className="item-inline text-muted">|&nbsp;</p>
         {this.renderCommentCounts()}
+        {this.renderToggleCommentsIcon()}
       </div>
     );
   }
